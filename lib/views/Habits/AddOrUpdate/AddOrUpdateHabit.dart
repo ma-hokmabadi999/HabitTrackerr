@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -248,10 +248,21 @@ class _AddOrUpdateHabitState extends State<AddOrUpdateHabit> {
                     labelColor: labelColor,
                     dateMap: dateMap,
                     updateDate: _updateDate),
-                SaveAndCancel(saveHabit: saveHabit),
               ],
             ),
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed:
+            saveHabit, // The action to perform when the button is pressed
+        child: Icon(
+          Icons.check, // Tick icon
+          color: Colors.white, // Icon color
+        ),
+        backgroundColor: Colors.green, // Background color of the button
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)), // Rounded shape
         ),
       ),
     );
