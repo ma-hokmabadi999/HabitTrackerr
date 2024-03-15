@@ -158,9 +158,7 @@ class _ProgressBarState extends State<ProgressBar> {
       onHorizontalDragEnd: (details) {
         if (_tempModifiedGoalCount < 1 && _fillPercentage < .49) {
           _updateFillPercentage(0.0, context);
-          setState(() {
-            _tempModifiedGoalCount = 0;
-          });
+
           // }
         } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
           _updateFillPercentage(1, context);
