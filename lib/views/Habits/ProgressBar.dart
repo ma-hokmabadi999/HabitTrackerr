@@ -60,7 +60,7 @@ class _ProgressBarState extends State<ProgressBar> {
     super.dispose();
   }
 
-  void _updateFillPercentage(double percentage, BuildContext context) {
+  Future _updateFillPercentage(double percentage, BuildContext context) async {
     if (percentage <= 0.04) {
       percentage = 0.0;
     } else if (percentage >= 0.92) {
@@ -92,18 +92,14 @@ class _ProgressBarState extends State<ProgressBar> {
           showedSameDateDialog = false;
         });
       }
-    } else {
-      if (!showedSameDateDialog) {
-        showSameDateDialog(context).then((_) => setState(() {
-              showedSameDateDialog =
-                  false; // Reset flag when dialog is dismissed.
-            }));
-        ;
-        print("canttt##");
-        // setState(() {
-        //   showedSameDateDialog = true;
-        // });
-      }
+    } else if (!showedSameDateDialog) {
+      setState(() {
+        showedSameDateDialog = true;
+      });
+      final temp = await showSameDateDialog(context);
+      setState(() {
+        showedSameDateDialog = temp;
+      });
     }
   }
 
@@ -140,7 +136,7 @@ class _ProgressBarState extends State<ProgressBar> {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return GestureDetector(
-      onHorizontalDragUpdate: (details) {
+      onHorizontalDragUpdate: (details) async {
         final RenderBox box =
             containerKey.currentContext!.findRenderObject() as RenderBox;
         final double dx = details.localPosition.dx;
@@ -150,30 +146,63 @@ class _ProgressBarState extends State<ProgressBar> {
 
         setHaveAnimation(false);
 
-        _updateFillPercentage(percentageFill, context);
+        await _updateFillPercentage(percentageFill, context);
         if (_fillPercentage == 1) {
           setHaveAnimation(true);
         }
       },
-      onHorizontalDragEnd: (details) {
+      onHorizontalDragEnd: (details) async {
         if (_tempModifiedGoalCount < 1) {
-          _updateFillPercentage(0.0, context);
+          await _updateFillPercentage(0.0, context);
 
           // }
         } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
-          _updateFillPercentage(1, context);
+          await _updateFillPercentage(1, context);
           setHaveAnimation(true);
         }
       },
       // onTapUp: (details) {
-      //   final RenderBox box =
-      //       containerKey.currentContext!.findRenderObject() as RenderBox;
-      //   final Offset localPosition = box.globalToLocal(details.globalPosition);
-      //   final double dx =
-      //       isRtl ? containerWidth - localPosition.dx : localPosition.dx;
-      //   final double percentageFill = (dx / containerWidth).clamp(0.0, 1.0);
+      //   // final RenderBox box =
+      //   //     containerKey.currentContext!.findRenderObject() as RenderBox;
+      //   // final double dx = details.localPosition.dx;
+      //   // final double percentageFill = isRtl
+      //   //     ? 1.0 - (dx / containerWidth).clamp(0.0, 1.0)
+      //   //     : (dx / containerWidth).clamp(0.0, 1.0);
 
-      //   _updateFillPercentage(percentageFill, context);
+      //   // setHaveAnimation(false);
+
+      //   // _updateFillPercentage(percentageFill, context);
+      //   if (_fillPercentage == 1) {
+      //     setHaveAnimation(true);
+      //   }
+      //   if (_tempModifiedGoalCount < 1) {
+      //     _updateFillPercentage(0.0, context);
+
+      //     // }
+      //   } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
+      //     _updateFillPercentage(1, context);
+      //     setHaveAnimation(true);
+      //   }
+      // },
+      // onTapCancel: () {
+      //   if (_tempModifiedGoalCount < 1) {
+      //     _updateFillPercentage(0.0, context);
+
+      //     // }
+      //   } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
+      //     _updateFillPercentage(1, context);
+      //     setHaveAnimation(true);
+      //   }
+      // },
+      // onTapDown: (details) {
+      //   if (_tempModifiedGoalCount < 1) {
+      //     _updateFillPercentage(0.0, context);
+
+      //     // }
+      //   } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
+      //     _updateFillPercentage(1, context);
+      //     setHaveAnimation(true);
+      //   }
       // },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),

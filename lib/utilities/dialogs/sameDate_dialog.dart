@@ -7,7 +7,7 @@ Future<bool> showSameDateDialog(BuildContext context) {
     title: '',
     content: 'شما قادر به تغییر روتین های پسین نیستید.',
     optionsBuilder: () => {
-      'باشه': null,
+      'باشه': false,
     },
   ).then(
     (value) => value ?? false,
