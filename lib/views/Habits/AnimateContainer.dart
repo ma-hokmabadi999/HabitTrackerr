@@ -7,10 +7,12 @@ class AnimatedContainerApp extends StatefulWidget {
   // final double height;
   final Color color;
   final int border;
+  final bool haveAnimation;
 
   const AnimatedContainerApp({
     Key? key,
     required this.width,
+    required this.haveAnimation,
     // required this.height,
     required this.color,
     required this.border,
@@ -40,7 +42,12 @@ class _AnimatedContainerAppState extends State<AnimatedContainerApp> {
         // borderRadius: BorderRadius.circular(widget.border.toDouble()),
       ),
       // Define how long the animation should take.
-      duration: Duration(milliseconds: (widget.width.toInt() == 0 ? 550 : 30)),
+      duration: Duration(
+          milliseconds: (widget.haveAnimation
+              ? 550
+              : widget.width.toInt() == 0
+                  ? 550
+                  : 30)),
       // Provide an optional curve to make the animation feel smoother.
       curve: Curves.fastOutSlowIn,
     );

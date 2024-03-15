@@ -245,9 +245,10 @@ class _AddOrUpdateHabitState extends State<AddOrUpdateHabit> {
                   setDaySelected: setDaySelected,
                 ),
                 SetDate(
-                    labelColor: labelColor,
-                    dateMap: dateMap,
-                    updateDate: _updateDate),
+                  labelColor: labelColor,
+                  dateMap: dateMap,
+                  updateDate: _updateDate,
+                ),
               ],
             ),
           ),

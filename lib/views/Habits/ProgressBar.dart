@@ -32,6 +32,7 @@ class _ProgressBarState extends State<ProgressBar> {
   late int _tempModifiedGoalCount;
   Timer? _timer;
   GlobalKey containerKey = GlobalKey();
+  bool _haveAnimation = false;
 
   void _startPeriodicTask() {
     const period = Duration(milliseconds: 200);
@@ -74,7 +75,11 @@ class _ProgressBarState extends State<ProgressBar> {
       setState(() {
         _fillPercentage = percentage;
         _tempModifiedGoalCount =
-            (widget.showHabit.goalCount * percentage).toInt();
+            widget.showHabit.goalCount == 1 && percentage > .49
+                ? 1
+                : (widget.showHabit.goalCount * percentage).toInt();
+
+        // (widget.showHabit.goalCount * percentage).toInt();
         // _fillPercentage = _tempModifiedGoalCount < 1 ? 0.0 : _fillPercentage;
       });
     } else {
@@ -103,6 +108,12 @@ class _ProgressBarState extends State<ProgressBar> {
     }
   }
 
+  void setHaveAnimation(bool have) {
+    setState(() {
+      _haveAnimation = have;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final containerWidth = MediaQuery.of(context).size.width;
@@ -117,11 +128,20 @@ class _ProgressBarState extends State<ProgressBar> {
             ? 1.0 - (dx / containerWidth).clamp(0.0, 1.0)
             : (dx / containerWidth).clamp(0.0, 1.0);
 
+        setHaveAnimation(false);
+
         _updateFillPercentage(percentageFill, context);
+        if (_fillPercentage == 1) {
+          setHaveAnimation(true);
+        }
       },
       onHorizontalDragEnd: (details) {
         if (_tempModifiedGoalCount < 1) {
           _updateFillPercentage(0.0, context);
+        }
+        if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
+          _updateFillPercentage(1, context);
+          setHaveAnimation(true);
         }
       },
       // onTapUp: (details) {
@@ -154,11 +174,13 @@ class _ProgressBarState extends State<ProgressBar> {
             child: Stack(
               children: [
                 AnimatedContainerApp(
-                    width: containerWidth * _fillPercentage,
-                    color: Color(int.parse(
-                        widget.showHabit.color.replaceFirst('#', '0xff'))),
-                    border: 4,
-                    height: 60),
+                  width: containerWidth * _fillPercentage,
+                  color: Color(int.parse(
+                      widget.showHabit.color.replaceFirst('#', '0xff'))),
+                  border: 4,
+                  height: 60,
+                  haveAnimation: _haveAnimation,
+                ),
                 Positioned.fill(
                   child: Align(
                     alignment: Alignment.center,
