@@ -44,10 +44,7 @@ class _HabitsViewState extends State<HabitsView> {
 
   Future<List<ShowHabit>> filterHabitsByDate(
       BuildContext context, List<Habit> habits) async {
-<<<<<<< HEAD
     // _habitService.cacheHabits(widget.isar);
-=======
->>>>>>> 7283a164704c560efb9d76a3bb0baafd0d4cafe8
     DateTime defaultEndDate = DateTime(1970, 1, 1);
     final filtered = habits.where((habit) {
       final bool isStartDateValid =

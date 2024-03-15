@@ -10,7 +10,7 @@ import 'package:weekdays/views/DateHeader/Dateslider.dart';
 // main home page
 import 'views/HomePage.dart';
 //////
-import 'views/Habits/AddOrUpdateHabit.dart';
+import 'views/Habits/AddOrUpdate/AddOrUpdateHabit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:weekdays/models/habit/habit.dart';
 import 'package:isar/isar.dart';

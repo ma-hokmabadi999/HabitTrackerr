@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:weekdays/models/habit/gotHabitProvider.dart';
 import 'package:weekdays/views/DateHeader/Dateslider.dart';
 import './Habits/showHabits.dart';
-import './Habits/AddOrUpdateHabit.dart';
+import 'Habits/AddOrUpdate/AddOrUpdateHabit.dart';
 import 'package:isar/isar.dart';
 
 class HomePage extends StatefulWidget {

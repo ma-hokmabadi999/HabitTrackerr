@@ -54,7 +54,7 @@ class DateItemsHeader extends StatelessWidget {
       // height: preferredSize.height,
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       decoration: BoxDecoration(
-        color: Color.fromRGBO(202, 19, 19, 1),
+        color: Color.fromRGBO(222, 222, 222, 1),
         // borderRadius: BorderRadius.circular(6),
       ),
       child: Row(

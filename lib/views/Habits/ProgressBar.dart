@@ -7,6 +7,7 @@ import 'package:persian_tools/persian_tools.dart';
 
 import 'package:weekdays/models/showhabit/showhabit.dart';
 import 'package:weekdays/utilities/dialogs/sameDate_dialog.dart';
+import 'package:weekdays/views/Habits/AnimateContainer.dart';
 
 class ProgressBar extends StatefulWidget {
   final Function(ShowHabit, int) updateShowHabit;
@@ -33,10 +34,8 @@ class _ProgressBarState extends State<ProgressBar> {
   GlobalKey containerKey = GlobalKey();
 
   void _startPeriodicTask() {
-    // This function is scheduled to run every 0.2 seconds
     const period = Duration(milliseconds: 200);
     _timer = Timer.periodic(period, (timer) async {
-      // Place your repeating task or function call here
       await widget.updateShowHabit(widget.showHabit, _tempModifiedGoalCount);
     });
   }
@@ -53,7 +52,6 @@ class _ProgressBarState extends State<ProgressBar> {
 
   @override
   void dispose() {
-    // Cancel the timer when the widget is disposed to prevent memory leaks
     _timer?.cancel();
     widget.updateShowHabit(widget.showHabit, _tempModifiedGoalCount);
     super.dispose();
@@ -77,6 +75,7 @@ class _ProgressBarState extends State<ProgressBar> {
         _fillPercentage = percentage;
         _tempModifiedGoalCount =
             (widget.showHabit.goalCount * percentage).toInt();
+        // _fillPercentage = _tempModifiedGoalCount < 1 ? 0.0 : _fillPercentage;
       });
     } else {
       showSameDateDialog(context);
@@ -93,26 +92,20 @@ class _ProgressBarState extends State<ProgressBar> {
   }
 
   Color ensureContrastWithWhite(Color color) {
-    // A placeholder function that checks if the color is dark enough for white text
-    // and adjusts it if not. This is a simplified example.
     final luminance = color.computeLuminance();
-    // Threshold might need adjustment based on your needs or specific contrast ratio requirements
     const threshold = 0.5;
 
     if (luminance > threshold) {
-      // If the color is too light for white text, make it darker
-      // This is a simple method and might not be suitable for all colors
       return Color.fromARGB(color.alpha, (color.red * 0.9).toInt(),
           (color.green * 0.9).toInt(), (color.blue * 0.9).toInt());
     } else {
-      // If the color is already dark enough, return it unchanged
       return color;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final containerWidth = MediaQuery.of(context).size.width - 15;
+    final containerWidth = MediaQuery.of(context).size.width;
     final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return GestureDetector(
@@ -126,55 +119,67 @@ class _ProgressBarState extends State<ProgressBar> {
 
         _updateFillPercentage(percentageFill, context);
       },
-      onTapUp: (details) {
-        final RenderBox box =
-            containerKey.currentContext!.findRenderObject() as RenderBox;
-        final Offset localPosition = box.globalToLocal(details.globalPosition);
-        final double dx =
-            isRtl ? containerWidth - localPosition.dx : localPosition.dx;
-        final double percentageFill = (dx / containerWidth).clamp(0.0, 1.0);
-
-        _updateFillPercentage(percentageFill, context);
+      onHorizontalDragEnd: (details) {
+        if (_tempModifiedGoalCount < 1) {
+          _updateFillPercentage(0.0, context);
+        }
       },
+      // onTapUp: (details) {
+      //   final RenderBox box =
+      //       containerKey.currentContext!.findRenderObject() as RenderBox;
+      //   final Offset localPosition = box.globalToLocal(details.globalPosition);
+      //   final double dx =
+      //       isRtl ? containerWidth - localPosition.dx : localPosition.dx;
+      //   final double percentageFill = (dx / containerWidth).clamp(0.0, 1.0);
+
+      //   _updateFillPercentage(percentageFill, context);
+      // },
       child: Container(
-        key: containerKey,
-        height: 60,
-        width: containerWidth + 20,
         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
         decoration: BoxDecoration(
-          color: ensureContrastWithWhite(lightenColor(widget.showHabit.color)),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius:
+              BorderRadius.circular(20), // This matches the ClipRRect's radius
         ),
-        child: Stack(
-          children: [
-            Container(
-              width: containerWidth * _fillPercentage,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Color(int.parse(
-                    widget.showHabit.color.replaceFirst('#', '0xff'))),
-                borderRadius: BorderRadius.all(Radius.circular(6)),
-              ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            key: containerKey,
+            height: 60,
+            width: containerWidth + 20,
+            decoration: BoxDecoration(
+              color:
+                  ensureContrastWithWhite(lightenColor(widget.showHabit.color)),
+              // borderRadius: BorderRadius.circular(4),
             ),
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.center,
-                child: Row(
-                  children: [
-                    textonbar(
-                        text: '${widget.showHabit.name} - مقدار : ',
-                        right: true),
-                    textonbar(
-                      text: '${widget.showHabit.goalCount}',
+            child: Stack(
+              children: [
+                AnimatedContainerApp(
+                    width: containerWidth * _fillPercentage,
+                    color: Color(int.parse(
+                        widget.showHabit.color.replaceFirst('#', '0xff'))),
+                    border: 4,
+                    height: 60),
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Row(
+                      children: [
+                        textonbar(
+                            text: '${widget.showHabit.name} - مقدار : ',
+                            right: true),
+                        textonbar(
+                          text: '${widget.showHabit.goalCount}',
+                        ),
+                        textonbar(
+                          text: '/ $_tempModifiedGoalCount ',
+                        ),
+                      ],
                     ),
-                    textonbar(
-                      text: '/ $_tempModifiedGoalCount ',
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
