@@ -16,19 +16,20 @@ class ProgressBar extends StatefulWidget {
   final bool checkDate;
   final DateTime date;
 
-  const ProgressBar(
-      {Key? key,
-      required this.date,
-      required this.showHabit,
-      required this.updateShowHabit,
-      required this.checkDate})
-      : super(key: key);
+  const ProgressBar({
+    Key? key,
+    required this.date,
+    required this.showHabit,
+    required this.updateShowHabit,
+    required this.checkDate,
+  }) : super(key: key);
 
   @override
   State<ProgressBar> createState() => _ProgressBarState();
 }
 
 class _ProgressBarState extends State<ProgressBar> {
+  bool showedSameDateDialog = false;
   late double _fillPercentage;
   late int _tempModifiedGoalCount;
   Timer? _timer;
@@ -76,15 +77,33 @@ class _ProgressBarState extends State<ProgressBar> {
       setState(() {
         _fillPercentage = percentage;
         _tempModifiedGoalCount =
-            widget.showHabit.goalCount == 1 && percentage > .49
+            widget.showHabit.goalCount == 1 && _fillPercentage > .49
                 ? 1
-                : (widget.showHabit.goalCount * percentage).toInt();
+                : (widget.showHabit.goalCount * _fillPercentage).toInt();
+        if (percentage == 0) {
+          _tempModifiedGoalCount = 0;
+        }
 
         // (widget.showHabit.goalCount * percentage).toInt();
         // _fillPercentage = _tempModifiedGoalCount < 1 ? 0.0 : _fillPercentage;
       });
+      if (showedSameDateDialog) {
+        setState(() {
+          showedSameDateDialog = false;
+        });
+      }
     } else {
-      showSameDateDialog(context);
+      if (!showedSameDateDialog) {
+        showSameDateDialog(context).then((_) => setState(() {
+              showedSameDateDialog =
+                  false; // Reset flag when dialog is dismissed.
+            }));
+        ;
+        print("canttt##");
+        // setState(() {
+        //   showedSameDateDialog = true;
+        // });
+      }
     }
   }
 
@@ -137,10 +156,13 @@ class _ProgressBarState extends State<ProgressBar> {
         }
       },
       onHorizontalDragEnd: (details) {
-        if (_tempModifiedGoalCount < 1) {
+        if (_tempModifiedGoalCount < 1 && _fillPercentage < .49) {
           _updateFillPercentage(0.0, context);
-        }
-        if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
+          setState(() {
+            _tempModifiedGoalCount = 0;
+          });
+          // }
+        } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
           _updateFillPercentage(1, context);
           setHaveAnimation(true);
         }
