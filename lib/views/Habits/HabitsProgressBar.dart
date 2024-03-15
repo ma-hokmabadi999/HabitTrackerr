@@ -3,7 +3,7 @@ import 'package:weekdays/models/showhabit/showhabit.dart';
 import 'package:weekdays/views/Habits/ProgressBar.dart';
 
 class HabitsProgressBar extends StatefulWidget {
-  final Function(ShowHabit, int) updateShowHabit;
+  final Function(int, int) updateShowHabit;
   final List<ShowHabit> showHabits;
   final bool checkDate;
   final Function(bool) setIsLoaded;

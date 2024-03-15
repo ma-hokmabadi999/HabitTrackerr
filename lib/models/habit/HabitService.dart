@@ -32,7 +32,8 @@ class HabitService with ChangeNotifier {
   }
 
   Future<void> addHabit(Habit habit, Isar isar) async {
-    if (habit.name != "") {
+    Habit? foundHabit = await getHabitByNameAndDate(habit.name, isar);
+    if (habit.name != "" && (foundHabit == null)) {
       await isar.writeTxn(() async {
         await isar.habits.put(habit);
         await cacheHabits(isar);
@@ -40,6 +41,15 @@ class HabitService with ChangeNotifier {
     } else {
       throw EmptyHabitName();
     }
+  }
+
+  Future<Habit?> getHabitByNameAndDate(String name, Isar isar) async {
+    final query = await isar.habits
+        .filter()
+        .nameEqualTo(name)
+        .findFirst(); // Use findFirst() to get the first matching document
+
+    return query;
   }
 
   Future<void> updateHabit(int habitId, Habit habit, Isar isar) async {

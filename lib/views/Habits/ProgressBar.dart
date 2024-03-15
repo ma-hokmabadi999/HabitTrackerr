@@ -11,7 +11,7 @@ import 'package:weekdays/utilities/dialogs/sameDate_dialog.dart';
 import 'package:weekdays/views/Habits/AnimateContainer.dart';
 
 class ProgressBar extends StatefulWidget {
-  final Function(ShowHabit, int) updateShowHabit;
+  final Function(int, int) updateShowHabit;
   final ShowHabit showHabit;
   final bool checkDate;
   final DateTime date;
@@ -39,7 +39,7 @@ class _ProgressBarState extends State<ProgressBar> {
   void _startPeriodicTask() {
     const period = Duration(milliseconds: 100);
     _timer = Timer.periodic(period, (timer) async {
-      await widget.updateShowHabit(widget.showHabit, _tempModifiedGoalCount);
+      await widget.updateShowHabit(widget.showHabit.id, _tempModifiedGoalCount);
     });
   }
 
@@ -56,7 +56,7 @@ class _ProgressBarState extends State<ProgressBar> {
   @override
   void dispose() {
     _timer?.cancel();
-    widget.updateShowHabit(widget.showHabit, _tempModifiedGoalCount);
+    widget.updateShowHabit(widget.showHabit.id, _tempModifiedGoalCount);
     super.dispose();
   }
 
@@ -208,7 +208,8 @@ class _ProgressBarState extends State<ProgressBar> {
                     child: Row(
                       children: [
                         textonbar(
-                            text: '${widget.showHabit.name} - مقدار : ',
+                            text:
+                                '${widget.showHabit.name}  ${widget.showHabit.id} - مقدار : ',
                             right: true),
                         textonbar(
                           text: '${widget.showHabit.goalCount}',

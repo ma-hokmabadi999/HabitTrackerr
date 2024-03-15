@@ -58,10 +58,9 @@ class _HabitsViewState extends State<HabitsView> {
     return _showHabitService.getListProgressBarShowHabit(filtered, widget.date);
   }
 
-  Future<void> updateShowHabit(
-      ShowHabit showHabit, int modifiedGoalCount) async {
+  Future<void> updateShowHabit(int showHabitId, int modifiedGoalCount) async {
     await _showHabitService.updateShowHabitHabitByModifiedGoalCount(
-        showHabit.id, modifiedGoalCount);
+        showHabitId, modifiedGoalCount);
   }
 
   @override
