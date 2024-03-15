@@ -37,7 +37,7 @@ class _ProgressBarState extends State<ProgressBar> {
   bool _haveAnimation = false;
 
   void _startPeriodicTask() {
-    const period = Duration(milliseconds: 200);
+    const period = Duration(milliseconds: 100);
     _timer = Timer.periodic(period, (timer) async {
       await widget.updateShowHabit(widget.showHabit, _tempModifiedGoalCount);
     });
@@ -156,7 +156,7 @@ class _ProgressBarState extends State<ProgressBar> {
         }
       },
       onHorizontalDragEnd: (details) {
-        if (_tempModifiedGoalCount < 1 && _fillPercentage < .49) {
+        if (_tempModifiedGoalCount < 1) {
           _updateFillPercentage(0.0, context);
 
           // }
