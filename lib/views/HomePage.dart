@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weekdays/models/habit/gotHabitProvider.dart';
 import 'package:weekdays/views/DateHeader/Dateslider.dart';
+import 'package:weekdays/views/HabitsStats/HabitsStats.dart';
 import './Habits/showHabits.dart';
 import 'Habits/AddOrUpdate/AddOrUpdateHabit.dart';
 import 'package:isar/isar.dart';
@@ -23,6 +24,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
   DateTime now = DateTime.now();
   List<List> weekDays = [];
   int? selectedIndex;
@@ -30,6 +32,32 @@ class _HomePageState extends State<HomePage> {
   DateTime dateHabitList = DateTime.now();
   bool isLoaded = false;
   bool ourcount = false;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    switch (index) {
+      case 0:
+        // Navigate to Statistics screen
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => HabitsStats()),
+        );
+        break;
+      case 1:
+        // Navigate to Add Habit screen
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => AddOrUpdateHabit(isar: widget.isar)),
+        );
+        break;
+
+      case 2:
+        // Navigate to Settings screen
+        // You need to create a Settings screen for this
+        break;
+    }
+  }
 
   // Add this line to track selected index
   @override
@@ -205,6 +233,37 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Statistics',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add, size: 30), // Custom icon size for emphasis
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors
+            .amber[800], // Highlight the selected item with a vibrant color
+        unselectedItemColor: Colors.grey, // Dull color for unselected items
+        onTap: _onItemTapped,
+        backgroundColor:
+            Colors.deepPurple[400], // A more dynamic background color
+        elevation: 20.0, // Higher elevation for a pronounced shadow
+        type: BottomNavigationBarType
+            .fixed, // Fixed type to accommodate three items
+        showUnselectedLabels: true, // Show labels for unselected items
+        selectedLabelStyle: TextStyle(
+            fontWeight: FontWeight.bold), // Bold text for selected item
+        unselectedLabelStyle:
+            TextStyle(fontSize: 12), // Smaller text for unselected items
       ),
     );
   }
