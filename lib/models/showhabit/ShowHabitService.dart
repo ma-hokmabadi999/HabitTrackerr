@@ -68,6 +68,16 @@ class ShowHabitService {
     return listOfProgressBars;
   }
 
+  Future<double> getShowHabitByNameAndDatePercentage(
+      DateTime dateItem, String name) async {
+    var showHabit = await getShowHabitByNameAndDate(name, dateItem);
+    if (showHabit != null) {
+      return showHabit.modifiedGoalCount / showHabit.goalCount;
+    } else {
+      return 0.0;
+    }
+  }
+
   Future<ShowHabit> getOrCreateProgressBarShowHabit(
       Habit habit, DateTime date) async {
     ShowHabit? foundShowHabit =

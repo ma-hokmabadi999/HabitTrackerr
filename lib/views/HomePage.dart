@@ -41,7 +41,8 @@ class _HomePageState extends State<HomePage> {
       case 0:
         // Navigate to Statistics screen
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => HabitsStats()),
+          MaterialPageRoute(
+              builder: (context) => HabitsStats(isar: widget.isar)),
         );
         break;
       case 1:

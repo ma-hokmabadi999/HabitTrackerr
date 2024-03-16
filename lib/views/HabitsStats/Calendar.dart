@@ -1,10 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:isar/isar.dart';
 import 'dart:math';
 import 'package:shamsi_date/shamsi_date.dart';
+import '../../models/showhabit/ShowHabitService.dart';
 
 class CustomCalendar extends StatefulWidget {
+  final bool isNone;
+  final Isar isar;
+  final String name;
+  const CustomCalendar({
+    Key? key,
+    required this.isar,
+    required this.name,
+    required this.isNone,
+  }) : super(key: key);
+
   @override
   _CustomCalendarState createState() => _CustomCalendarState();
 }
@@ -13,20 +27,52 @@ class _CustomCalendarState extends State<CustomCalendar> {
   Jalali _focusedDay = Jalali.now();
   late Map<Jalali, double> _fillPercentages;
   double defaultBorderRadios = 10;
+  late final ShowHabitService _showHabitService;
 
   @override
   void initState() {
     super.initState();
     _initializeFillPercentages();
+    _showHabitService = ShowHabitService(widget.isar);
   }
 
   void _initializeFillPercentages() {
-    _fillPercentages = {};
+    Map<Jalali, double> fillPercentagestemp = {};
     int totalDays = _focusedDay.monthLength;
     for (int i = 1; i <= totalDays; i++) {
-      _fillPercentages[Jalali(_focusedDay.year, _focusedDay.month, i)] =
-          Random().nextDouble();
+      fillPercentagestemp[Jalali(_focusedDay.year, _focusedDay.month, i)] = 0;
     }
+    setState(() {
+      _fillPercentages = fillPercentagestemp;
+    });
+  }
+
+  Future<Map<Jalali, double>> getNewPercentages(
+      String name, Map<Jalali, double> originPercentages) async {
+    print("doingit%%%%");
+    Map<Jalali, double> temp = originPercentages;
+    List<Jalali> keysList = _fillPercentages.keys.toList();
+    double tempPercentage = 0.0;
+    for (var i = 0; i < keysList.length; i++) {
+      DateTime gregorianDate = convertToGregorianWithMidnight(keysList[i]);
+      tempPercentage = await _showHabitService
+          .getShowHabitByNameAndDatePercentage(gregorianDate, name);
+      temp[keysList[i]] = tempPercentage;
+    }
+    print(temp.toString());
+    print(temp.length);
+    return temp;
+  }
+
+  DateTime convertToGregorianWithMidnight(Jalali date) {
+    // Assuming _focusedDay is your Jalali date
+
+    // Convert Jalali to Gregorian
+    Gregorian gregorianDate = date.toGregorian();
+
+    // Create a new DateTime object with the time set to midnight (00:00:00)
+    return DateTime(
+        gregorianDate.year, gregorianDate.month, gregorianDate.day, 0, 0, 0);
   }
 
   void _selectYear(BuildContext context) async {
@@ -143,8 +189,11 @@ class _CustomCalendarState extends State<CustomCalendar> {
                       Center(
                         child: Text(
                           '${day.day}',
-                          style:
-                              TextStyle(color: Color.fromARGB(255, 77, 76, 76)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: fillPercentage == 0
+                                  ? Color.fromARGB(255, 77, 76, 76)
+                                  : Colors.white),
                         ),
                       ),
                     ],
@@ -262,7 +311,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
     );
   }
 
-  Widget _buildCalendarGrid() {
+  Widget _buildCalendarGrid(Map<Jalali, double> monthList) {
     List<Widget> weekRows = [];
     int totalDays = _focusedDay.monthLength;
     Jalali firstDayOfMonth = Jalali(_focusedDay.year, _focusedDay.month, 1);
@@ -289,7 +338,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
           // Current month day
           Jalali currentDay =
               Jalali(_focusedDay.year, _focusedDay.month, dayCounter);
-          double fillPercentage = _fillPercentages[currentDay] ?? 0.0;
+          double fillPercentage = monthList[currentDay] ?? 0.0;
           dayCounter++;
           return _buildDayWidget(currentDay, fillPercentage);
         }
@@ -328,7 +377,6 @@ class _CustomCalendarState extends State<CustomCalendar> {
                   ),
                 ],
               ),
-              margin: EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -339,7 +387,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _ArrowForMonth(
-                            () => _gotoPreviousMonth(), Icons.arrow_back),
+                            () => _gotoNextMonth(), Icons.arrow_back),
                         Flexible(
                           // Make the date selection flexible to use the available space
                           fit: FlexFit.tight,
@@ -362,21 +410,70 @@ class _CustomCalendarState extends State<CustomCalendar> {
                           ),
                         ),
                         _ArrowForMonth(
-                            () => _gotoNextMonth(), Icons.arrow_forward),
+                            () => _gotoPreviousMonth(), Icons.arrow_forward),
                       ],
                     ),
                   ),
                   _buildDayInitialsRow(),
-                  Container(
-                    width: maxWidth,
-                    child: _buildCalendarGrid(),
-                  ),
+                  ShowCalendar(
+                    name: widget.name,
+                    originPercentages: _fillPercentages,
+                    getNewPercentages: getNewPercentages,
+                    maxWidth: maxWidth,
+                    buildCalendarGrid: _buildCalendarGrid,
+                    isNone: widget.isNone,
+                  )
                 ],
               ),
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class ShowCalendar extends StatefulWidget {
+  final bool isNone;
+  final Function(Map<Jalali, double>) buildCalendarGrid;
+  final String name;
+  final double maxWidth;
+  final Map<Jalali, double> originPercentages;
+  final Function(String name, Map<Jalali, double> originPercentages)
+      getNewPercentages;
+  const ShowCalendar({
+    super.key,
+    required this.name,
+    required this.originPercentages,
+    required this.getNewPercentages,
+    required this.maxWidth,
+    required this.buildCalendarGrid,
+    required this.isNone,
+  });
+
+  @override
+  State<ShowCalendar> createState() => _ShowCalendarState();
+}
+
+class _ShowCalendarState extends State<ShowCalendar> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<Jalali, double>>(
+      future: widget.getNewPercentages(widget.name, widget.originPercentages),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          return Container(
+            width: widget.maxWidth,
+            child: widget.buildCalendarGrid(
+                !widget.isNone ? snapshot.data! : widget.originPercentages),
+          );
+        } else {
+          return Container(
+            width: widget.maxWidth,
+            child: widget.buildCalendarGrid(widget.originPercentages),
+          );
+        }
+      },
     );
   }
 }
