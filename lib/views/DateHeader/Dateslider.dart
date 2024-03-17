@@ -101,7 +101,7 @@ class _weekSliderState extends State<weekSlider> {
           },
           child: DateItemsHeader(
             datesList: weekDays,
-            selectedIndex: widget.selectedIndex,
+            selectedIndex: widget.selectedIndex ?? 0,
             onDateSelected: widget.onDateSelected,
             setDateHabit: widget.setDateHabit,
           ),

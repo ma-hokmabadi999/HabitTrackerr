@@ -52,7 +52,7 @@ class DateItemsHeader extends StatelessWidget {
       alignment: Alignment.center,
       // margin: const EdgeInsets.all(3),
       // height: preferredSize.height,
-      padding: const EdgeInsets.only(top: 10, bottom: 10),
+      padding: const EdgeInsets.only(top: 0, bottom: 0),
       decoration: BoxDecoration(
         color: Color.fromRGBO(222, 222, 222, 1),
         // borderRadius: BorderRadius.circular(6),

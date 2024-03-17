@@ -89,7 +89,7 @@ class _HabitsViewState extends State<HabitsView> {
             } else {
               return Container(
                 margin: EdgeInsets.all(10),
-                child: Text("data"),
+                child: Text(""),
               );
             }
           },

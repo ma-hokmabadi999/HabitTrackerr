@@ -4,7 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:persian_tools/persian_tools.dart';
 import 'package:provider/provider.dart';
+import 'package:shamsi_date/shamsi_date.dart';
+import 'package:weekdays/constants/navigationBar.dart';
 import 'package:weekdays/models/habit/gotHabitProvider.dart';
 import 'package:weekdays/views/DateHeader/Dateslider.dart';
 import 'package:weekdays/views/HabitsStats/HabitsStats.dart';
@@ -32,33 +35,6 @@ class _HomePageState extends State<HomePage> {
   DateTime dateHabitList = DateTime.now();
   bool isLoaded = false;
   bool ourcount = false;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-    switch (index) {
-      case 0:
-        // Navigate to Statistics screen
-        Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (context) => HabitsStats(isar: widget.isar)),
-        );
-        break;
-      case 1:
-        // Navigate to Add Habit screen
-        Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (context) => AddOrUpdateHabit(isar: widget.isar)),
-        );
-        break;
-
-      case 2:
-        // Navigate to Settings screen
-        // You need to create a Settings screen for this
-        break;
-    }
-  }
 
   // Add this line to track selected index
   @override
@@ -165,6 +141,55 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  String getShamsi(DateTime date) {
+    Jalali jalaliDate = Jalali.fromDateTime(date);
+
+    // Find today's date in Jalali
+    Jalali today = Jalali.now();
+
+    // Find yesterday and tomorrow in Jalali
+    Jalali yesterday = today.addDays(-1);
+    Jalali tomorrow = today.addDays(1);
+
+    String formattedDate = "";
+
+    // Check if the date is today, yesterday, or tomorrow
+    if (jalaliDate.year == today.year &&
+        jalaliDate.month == today.month &&
+        jalaliDate.day == today.day) {
+      formattedDate = 'امروز';
+    } else if (jalaliDate.year == yesterday.year &&
+        jalaliDate.month == yesterday.month &&
+        jalaliDate.day == yesterday.day) {
+      formattedDate = 'دیروز';
+    } else if (jalaliDate.year == tomorrow.year &&
+        jalaliDate.month == tomorrow.month &&
+        jalaliDate.day == tomorrow.day) {
+      formattedDate = 'فردا';
+    } else {
+      // Otherwise, return the formatted Jalali date
+      formattedDate =
+          "${convertEnToFa(jalaliDate.day.toString())} ${jalaliDate.formatter.mN}";
+    }
+    return formattedDate;
+  }
+
+  void _handleMenuSelection(String value) {
+    switch (value) {
+      case 'تنظیمات':
+        // Navigate to Settings Page
+        // Navigator.of(context)
+        //     .push(MaterialPageRoute(builder: (context) => SettingsPage()));
+        break;
+      case 'آنالیز':
+        // Navigate to HabitsStats Page
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => HabitsStats(isar: widget.isar)));
+        break;
+      // Add more cases as needed
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var counter = Provider.of<CounterModel>(context, listen: false);
@@ -214,8 +239,32 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(222, 222, 222, 1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 12),
+                    decoration: BoxDecoration(
+                        // color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Text(
+                      getShamsi(dateHabitList),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             SizedBox(
-              height: 130,
+              height: 90,
               child: weekSlider(
                 isar: widget.isar,
                 selectedIndex: selectedIndex,
@@ -235,37 +284,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Statistics',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add, size: 30), // Custom icon size for emphasis
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors
-            .amber[800], // Highlight the selected item with a vibrant color
-        unselectedItemColor: Colors.grey, // Dull color for unselected items
-        onTap: _onItemTapped,
-        backgroundColor:
-            Colors.deepPurple[400], // A more dynamic background color
-        elevation: 20.0, // Higher elevation for a pronounced shadow
-        type: BottomNavigationBarType
-            .fixed, // Fixed type to accommodate three items
-        showUnselectedLabels: true, // Show labels for unselected items
-        selectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.bold), // Bold text for selected item
-        unselectedLabelStyle:
-            TextStyle(fontSize: 12), // Smaller text for unselected items
-      ),
+      bottomNavigationBar: const CustomBottomNavBar(),
     );
   }
 }

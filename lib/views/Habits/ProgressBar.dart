@@ -130,6 +130,39 @@ class _ProgressBarState extends State<ProgressBar> {
     });
   }
 
+  void _showEditDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              // Delete button
+              TextButton.icon(
+                icon: Icon(Icons.delete, color: Colors.red),
+                label: Text('حذف'),
+                onPressed: () {
+                  // Handle delete action
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+              // Edit button
+              TextButton.icon(
+                icon: Icon(Icons.edit, color: Colors.blue),
+                label: Text('ویرایش'),
+                onPressed: () {
+                  // Handle edit action
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final containerWidth = MediaQuery.of(context).size.width;
@@ -161,49 +194,11 @@ class _ProgressBarState extends State<ProgressBar> {
           setHaveAnimation(true);
         }
       },
-      // onTapUp: (details) {
-      //   // final RenderBox box =
-      //   //     containerKey.currentContext!.findRenderObject() as RenderBox;
-      //   // final double dx = details.localPosition.dx;
-      //   // final double percentageFill = isRtl
-      //   //     ? 1.0 - (dx / containerWidth).clamp(0.0, 1.0)
-      //   //     : (dx / containerWidth).clamp(0.0, 1.0);
-
-      //   // setHaveAnimation(false);
-
-      //   // _updateFillPercentage(percentageFill, context);
-      //   if (_fillPercentage == 1) {
-      //     setHaveAnimation(true);
-      //   }
-      //   if (_tempModifiedGoalCount < 1) {
-      //     _updateFillPercentage(0.0, context);
-
-      //     // }
-      //   } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
-      //     _updateFillPercentage(1, context);
-      //     setHaveAnimation(true);
-      //   }
-      // },
-      // onTapCancel: () {
-      //   if (_tempModifiedGoalCount < 1) {
-      //     _updateFillPercentage(0.0, context);
-
-      //     // }
-      //   } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
-      //     _updateFillPercentage(1, context);
-      //     setHaveAnimation(true);
-      //   }
-      // },
-      // onTapDown: (details) {
-      //   if (_tempModifiedGoalCount < 1) {
-      //     _updateFillPercentage(0.0, context);
-
-      //     // }
-      //   } else if (_tempModifiedGoalCount == widget.showHabit.goalCount) {
-      //     _updateFillPercentage(1, context);
-      //     setHaveAnimation(true);
-      //   }
-      // },
+      onTapUp: (details) {},
+      onLongPress: () {
+        _showEditDeleteDialog(context);
+        print("longpress");
+      },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
         decoration: BoxDecoration(

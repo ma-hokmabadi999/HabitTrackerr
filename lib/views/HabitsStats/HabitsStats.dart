@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
+import 'package:weekdays/constants/navigationBar.dart';
 import 'package:weekdays/models/habit/HabitService.dart';
 import 'package:weekdays/models/habit/habit.dart';
 import 'package:weekdays/views/HabitsStats/Calendar.dart';
@@ -105,11 +106,13 @@ class _HabitsStatsState extends State<HabitsStats> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
         title: Text("آنالیز روتین ها"),
       ),
       body: SafeArea(
         child: analizeHabit(),
       ),
+      bottomNavigationBar: const CustomBottomNavBar(),
     );
   }
 }

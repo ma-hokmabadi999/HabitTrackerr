@@ -32,14 +32,11 @@ class _HabitsProgressBarState extends State<HabitsProgressBar> {
         itemCount: widget.showHabits.length,
         itemBuilder: (context, index) {
           final showHabit = widget.showHabits[index];
-          return AnimatedItem(
-            key: ValueKey(showHabit.id), // Unique key for each item
-            child: ProgressBar(
-              showHabit: showHabit,
-              updateShowHabit: widget.updateShowHabit,
-              checkDate: widget.checkDate,
-              date: widget.date,
-            ),
+          return ProgressBar(
+            showHabit: showHabit,
+            updateShowHabit: widget.updateShowHabit,
+            checkDate: widget.checkDate,
+            date: widget.date,
           );
         },
       ),

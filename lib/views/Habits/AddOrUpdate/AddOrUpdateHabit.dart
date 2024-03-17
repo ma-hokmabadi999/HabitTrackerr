@@ -192,7 +192,7 @@ class _AddOrUpdateHabitState extends State<AddOrUpdateHabit> {
         screenWidth < 600 ? 14 : 16; // Smaller font size for smaller screens
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Color.fromARGB(255, 206, 224, 230),
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text(
